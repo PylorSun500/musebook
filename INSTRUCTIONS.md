@@ -60,7 +60,7 @@ Lomse 的最新发布版本是 2022 年的 0.30.0，可能对现代编译器标�
 - [x] 明确本项目的发布形态：开源。
 - [x] 确认所用 Qt 模块的许可证：Qt Widgets、Qt Multimedia、Qt PDF 均为 LGPLv3 或 GPLv2。Qt 6 的 Qt PDF 是独立模块，底层为 PDFium，不依赖 QtWebEngine，可在安装器中单独选择。
 
-当前本机的 Qt 6.12.0 安装中已有 Widgets、Multimedia、MultimediaWidgets、PrintSupport、Svg 和 Test，但**没有安装 Qt PDF**。这不影响阶段 0 到阶段 3，阶段 4 的 PDF 预览需要先用 `~/Qt/MaintenanceTool.app` 补装 `Qt6::Pdf` 与 `Qt6::PdfWidgets`。
+本机 Qt 6.12.0 已安装 Widgets、Multimedia、MultimediaWidgets、PrintSupport、Svg、Test 以及 Pdf 与 PdfWidgets，阶段 4 的 PDF 预览不再有缺失的依赖。但 `Qt6::Pdf` 不会在阶段 4 之前写入 CMake 配置，避免声明尚未使用的依赖。
 - [x] 确认候选乐谱库的许可证：MuseScore Studio 为 GPL-3.0；Verovio 为 LGPLv3；Lomse 为 MIT。
 - [x] 选定本项目自身的开源许可证：MIT。它与 Lomse（MIT）和 Verovio（LGPLv3）都兼容，不预先排除阶段 5 的任何方案。如果最终走 MuseScore 路线，届时再改为 GPL-3，单人项目改许可证的成本很低。
 

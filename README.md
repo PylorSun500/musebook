@@ -61,7 +61,6 @@ Qt Creator 会自动读取 `.clang-format`。
 
 ## 已知待办
 
-- **Qt PDF 未安装。** 阶段 4 的 PDF 预览需要 `Qt6::Pdf` 与 `Qt6::PdfWidgets`，届时用 `~/Qt/MaintenanceTool.app` 补装。
 - **GitHub Actions 尚未验证。** `.github/workflows/build.yml` 只做编译检查，需推送到 GitHub 后确认 `install-qt-action` 能取到 Qt 6.12.0；若取不到，退到 `6.12.*` 并在此记录本地与 CI 的版本差异。
 
 ## 许可证

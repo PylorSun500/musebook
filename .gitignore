@@ -18,3 +18,7 @@ compile_commands.json
 
 # macOS
 .DS_Store
+
+# 文档备份
+*_副本.md
+*.bak
