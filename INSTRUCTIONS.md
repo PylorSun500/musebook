@@ -49,6 +49,8 @@ Lomse 的最新发布版本是 2022 年的 0.30.0，可能对现代编译器标�
 - [x] 配置编译器警告与基本代码格式规范。警告集中在 `musebook_warnings` 这个 INTERFACE target 上，由各 target 显式链接，这样阶段 1.5 引入的第三方乐谱库不会被本项目的警告级别波及。不启用 `-Werror`：Qt 头文件在 `-Wconversion` 这类开关下会报警，警告作为信号而非阻塞。格式规范在 `.clang-format`。
 - [x] 建立 Windows 构建验证方案。`.github/workflows/build.yml` 在 macOS 与 Windows 上各做一次纯编译检查，不打包、不发布、不跑测试，因此不属于本阶段排除的「完整 CI/CD 流程」。
 
+**CI 不作为 macOS 的验收手段。** GitHub 的 macOS runner 排队时间过长，等它出结果不符合开发节奏。macOS 的验收标准是本机构建通过并能正常启动，这在每次本地构建时都已完成。CI 的 macOS job 保留，但只提供一项本地做不到的覆盖：从干净 checkout 构建，能发现漏提交的源文件。它失败时才需要关注，不必等它通过。
+
 CI 的 Windows job 使用 Qt 6.10.3，而不是本地和 macOS job 的 6.12.0。Qt 从 6.11.0 起改变了 Windows 仓库的目录布局，`aqtinstall` 3.3.0 仍按旧布局查找 `Updates.xml`，安装 6.11 及以上版本会失败。这个差异的后果是：用到 Qt 6.11 或 6.12 新增接口时，Windows 侧的 CI 检查不会报错，但 Windows 本地构建会。阶段 7 做真正的 Windows 发布时必须在本机用 6.12 验证一遍，不能只依赖 CI。
 
 构建配置的统一入口是 `CMakePresets.json`，命令行与 IDE 共用同一套配置，这是「通过 IDE 和命令行构建」这条验收标准得以成立的前提。

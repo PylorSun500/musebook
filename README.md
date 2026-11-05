@@ -65,7 +65,9 @@ Qt Creator 会自动读取 `.clang-format`。
 
   实际影响：Windows 侧的编译检查基于 Qt 6.10 的 API，用到 6.11 或 6.12 新增接口时 CI 不会报错，但 Windows 本地构建会。阶段 7 做真正的 Windows 发布时需要在本机用 6.12 验证。
 
-  Windows job 已验证通过（Qt 6.10.3 + MSVC 2022 + Ninja）。macOS job 尚未完整跑过一次，但 macOS 是本地开发平台，每次构建都在验证，CI 上的该 job 只是冗余覆盖。
+  Windows job 已验证通过（Qt 6.10.3 + MSVC 2022 + Ninja）。
+
+- **CI 不是 macOS 的验收手段。** macOS runner 排队时间过长。macOS 侧以本机构建为准，CI 的 macOS job 只覆盖一件本地做不到的事：从干净 checkout 构建，能发现漏提交的源文件。它失败时才需要关注。
 
 ## 许可证
 
