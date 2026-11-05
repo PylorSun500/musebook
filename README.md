@@ -61,7 +61,11 @@ Qt Creator 会自动读取 `.clang-format`。
 
 ## 已知待办
 
-- **GitHub Actions 尚未验证。** `.github/workflows/build.yml` 只做编译检查，需推送到 GitHub 后确认 `install-qt-action` 能取到 Qt 6.12.0；若取不到，退到 `6.12.*` 并在此记录本地与 CI 的版本差异。
+- **CI 上 Windows 侧的 Qt 版本低于本地。** 本地与 CI 的 macOS 都用 Qt 6.12.0，但 CI 的 Windows job 只能用 6.10.3。Qt 从 6.11.0 起改变了 Windows 仓库的目录布局，`Updates.xml` 从 `qt6_6120/qt6_6120/` 移到了 `qt6_6120/qt6_6120_msvc2022_64/`，而 `aqtinstall` 3.3.0（当前最新版）仍按旧布局查找，安装会失败。6.10.3 是旧布局下的最后一个版本。等 aqtinstall 支持新布局后应改回与本地一致。
+
+  实际影响：Windows 侧的编译检查基于 Qt 6.10 的 API，用到 6.11 或 6.12 新增接口时 CI 不会报错，但 Windows 本地构建会。阶段 7 做真正的 Windows 发布时需要在本机用 6.12 验证。
+
+  Windows job 已验证通过（Qt 6.10.3 + MSVC 2022 + Ninja）。macOS job 尚未完整跑过一次，但 macOS 是本地开发平台，每次构建都在验证，CI 上的该 job 只是冗余覆盖。
 
 ## 许可证
 
