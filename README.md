@@ -67,7 +67,13 @@ Qt Creator 会自动读取 `.clang-format`。
 
   Windows job 已验证通过（Qt 6.10.3 + MSVC 2022 + Ninja）。
 
-- **CI 不是 macOS 的验收手段。** macOS runner 排队时间过长。macOS 侧以本机构建为准，CI 的 macOS job 只覆盖一件本地做不到的事：从干净 checkout 构建，能发现漏提交的源文件。它失败时才需要关注。
+- **CI 不是 macOS 的验收手段。** macOS runner 排队时间过长，macOS 侧以本机构建为准。因此 CI 中只有 Windows job 随 push 自动运行，macOS job 需手动触发：
+
+  ```sh
+  gh workflow run build.yml
+  ```
+
+  它只覆盖一件本地做不到的事：从干净 checkout 构建，能发现漏提交的源文件。
 
 ## 许可证
 
