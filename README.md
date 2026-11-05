@@ -49,6 +49,18 @@ cmake --build --preset windows-debug
 
 在 Qt Creator 中打开本目录下的 `CMakeLists.txt` 即可。
 
+## 运行
+
+```sh
+./build/macos-release/src/musebook.app/Contents/MacOS/musebook --cells 40 --wrap
+```
+
+- `--cells N` 启动时填充 N 个占位单元格
+- `--wrap` Text 单元格使用自动换行与内容决定的高度
+- `--benchmark` 运行性能测量，打印结果后退出
+
+性能测量的结论记录在 [INSTRUCTIONS.md](INSTRUCTIONS.md) 的阶段 1 一节。
+
 ## 代码格式
 
 格式规范在 `.clang-format`。macOS 上的 clang-format 来自 Xcode 工具链，不在 PATH 上：

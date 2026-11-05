@@ -1,7 +1,14 @@
 qt_add_executable(musebook
     main.cpp
+    CellType.h
     MainWindow.h
     MainWindow.cpp
+    NotebookView.h
+    NotebookView.cpp
+    PlaceholderCellWidget.h
+    PlaceholderCellWidget.cpp
+    ScrollBenchmark.h
+    ScrollBenchmark.cpp
 )
 
 target_compile_definitions(musebook
