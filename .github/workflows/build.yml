@@ -40,10 +40,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 本地开发用 Qt 6.12.0，这里只能用 6.10.3。
+      # 原因：Qt 从 6.11.0 起改变了 Windows 仓库的目录布局，
+      # Updates.xml 从 qt6_6120/qt6_6120/ 移到了 qt6_6120/qt6_6120_msvc2022_64/，
+      # 而 aqtinstall 3.3.0（当前最新）仍按旧布局查找，于是报
+      # "Failed to locate XML data for Qt version"。6.10.3 是旧布局下的最后一个版本。
+      # macOS 侧不受影响，仍用 6.12.0。
+      # 等 aqtinstall 支持新布局后，这里应改回与本地一致的版本。
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.12.0'
+          version: '6.10.3'
           host: windows
           target: desktop
           arch: win64_msvc2022_64
