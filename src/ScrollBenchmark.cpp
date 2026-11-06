@@ -31,7 +31,7 @@ double percentile(const std::vector<double>& sorted, double fraction) {
 } // namespace
 
 QString ScrollBenchmarkResult::toText() const {
-    return QStringLiteral("单元格 %1 个\n"
+    return QStringLiteral("单元格 %1 个，其中已物化 widget %11 个\n"
                           "构造 %2 ms，布局 %3 ms\n"
                           "滚动帧耗时（%4 帧）：中位 %5 ms，p95 %6 ms，最大 %7 ms\n"
                           "改变宽度耗时：中位 %8 ms，最大 %9 ms\n"
@@ -45,7 +45,8 @@ QString ScrollBenchmarkResult::toText() const {
         .arg(maxFrameMs, 0, 'f', 2)
         .arg(medianResizeMs, 0, 'f', 1)
         .arg(maxResizeMs, 0, 'f', 1)
-        .arg(static_cast<double>(rssBytes) / (1024.0 * 1024.0), 0, 'f', 1);
+        .arg(static_cast<double>(rssBytes) / (1024.0 * 1024.0), 0, 'f', 1)
+        .arg(liveWidgets);
 }
 
 qint64 currentRssBytes() {
@@ -127,6 +128,7 @@ ScrollBenchmarkResult runScrollBenchmark(NotebookView* view, int count, int fram
     result.maxResizeMs = resizeTimes.empty() ? 0.0 : resizeTimes.back();
 
     result.rssBytes = currentRssBytes() - rssBefore;
+    result.liveWidgets = view->liveWidgetCount();
     result.frameCount = static_cast<int>(frameTimes.size());
 
     std::sort(frameTimes.begin(), frameTimes.end());

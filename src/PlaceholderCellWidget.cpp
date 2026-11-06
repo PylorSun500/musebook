@@ -1,9 +1,28 @@
 #include "PlaceholderCellWidget.h"
 
+#include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
 
 namespace {
+
+/// 单元格内部边距。高度计算与实际渲染必须用同一组数值，
+/// 否则虚拟化分配的槽位会与 widget 的真实高度错开。
+constexpr int horizontalPadding = 10;
+constexpr int verticalPadding = 8;
+
+/// 标签的对齐与换行标志。测量与渲染用同一组标志，理由同上。
+constexpr Qt::Alignment labelAlignment = Qt::AlignLeft | Qt::AlignTop;
+
+/// StyledPanel 的边框宽度由样式决定，不是常量，而布局确实为它留了空间。
+/// 用一次性的原型问出来，比写死一个数字更稳——差一像素，每个单元格都会错开。
+int frameThickness() {
+    static const int thickness = [] {
+        const PlaceholderCellWidget probe;
+        return probe.frameWidth();
+    }();
+    return thickness;
+}
 
 QString typeName(CellType type) {
     switch (type) {
@@ -44,27 +63,50 @@ QString sampleParagraph(int index) {
     return text;
 }
 
+/// 换行高度由内容决定，固定高度不由内容决定。两处都要判断，因此集中在这里。
+bool wrapsContent(CellType type, bool wrapping) {
+    return wrapping && type == CellType::Text;
+}
+
 } // namespace
 
-PlaceholderCellWidget::PlaceholderCellWidget(CellType type, int index, bool wrapping,
-                                             QWidget* parent)
-    : QFrame(parent), m_type(type), m_label(new QLabel(this)) {
+QString placeholderCellText(CellType type, int index, bool wrapping) {
+    if (wrapsContent(type, wrapping)) {
+        return sampleParagraph(index);
+    }
+    return QStringLiteral("%1  ·  %2").arg(index).arg(typeName(type));
+}
+
+int placeholderCellHeight(const QFontMetrics& metrics, CellType type, const QString& text,
+                          int cellWidth, bool wrapping) {
+    if (!wrapsContent(type, wrapping)) {
+        return preferredHeight(type);
+    }
+
+    const int available = cellWidth - 2 * (horizontalPadding + frameThickness());
+    if (available <= 0) {
+        return preferredHeight(type);
+    }
+
+    const QRect bounds =
+        metrics.boundingRect(QRect(0, 0, available, 0), Qt::TextWordWrap | labelAlignment, text);
+    return bounds.height() + 2 * (verticalPadding + frameThickness());
+}
+
+PlaceholderCellWidget::PlaceholderCellWidget(QWidget* parent)
+    : QFrame(parent), m_label(new QLabel(this)) {
     setFrameShape(QFrame::StyledPanel);
 
-    const bool wrapThis = wrapping && type == CellType::Text;
-    if (wrapThis) {
-        // 高度交给内容决定，布局必须为每个单元格做 heightForWidth 计算。
-        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-        m_label->setWordWrap(true);
-        m_label->setText(sampleParagraph(index));
-    } else {
-        setFixedHeight(preferredHeight(type));
-        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        m_label->setText(QStringLiteral("%1  ·  %2").arg(index).arg(typeName(type)));
-    }
-    m_label->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_label->setAlignment(labelAlignment);
 
     auto* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(10, 8, 10, 8);
+    layout->setContentsMargins(horizontalPadding, verticalPadding, horizontalPadding,
+                               verticalPadding);
     layout->addWidget(m_label);
+}
+
+void PlaceholderCellWidget::setCell(CellType type, const QString& text, bool wrapping) {
+    m_type = type;
+    m_label->setWordWrap(wrapsContent(type, wrapping));
+    m_label->setText(text);
 }

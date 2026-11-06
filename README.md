@@ -4,7 +4,7 @@
 
 目标平台：macOS、Windows。开发计划见 [INSTRUCTIONS.md](INSTRUCTIONS.md)。
 
-当前进度：阶段 0，工程骨架。
+当前进度：阶段 1，界面骨架。
 
 ## 环境要求
 
@@ -59,7 +59,7 @@ cmake --build --preset windows-debug
 - `--wrap` Text 单元格使用自动换行与内容决定的高度
 - `--benchmark` 运行性能测量，打印结果后退出
 
-性能测量的结论记录在 [INSTRUCTIONS.md](INSTRUCTIONS.md) 的阶段 1 一节。
+性能测量的结论记录在 [INSTRUCTIONS.md](INSTRUCTIONS.md) 的阶段 1 一节。`NotebookView` 因此不使用 `QLayout`：单元格高度在不创建 widget 的情况下算出，真实 widget 只为可见区间创建并复用。改动它之前请先读那一节。
 
 ## 代码格式
 

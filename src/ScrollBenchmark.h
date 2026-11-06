@@ -19,6 +19,9 @@ struct ScrollBenchmarkResult {
     double medianResizeMs = 0.0;
     double maxResizeMs = 0.0;
     qint64 rssBytes = 0;
+    /// 测量结束时真实存在的单元格 widget 数量。
+    /// 虚拟化是否生效由这个数字证明：它应当只跟 viewport 高度有关，与单元格总数无关。
+    int liveWidgets = 0;
 
     QString toText() const;
 };
