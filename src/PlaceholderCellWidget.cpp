@@ -3,6 +3,8 @@
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
+#include <QPalette>
 
 namespace {
 
@@ -10,6 +12,9 @@ namespace {
 /// 否则虚拟化分配的槽位会与 widget 的真实高度错开。
 constexpr int horizontalPadding = 10;
 constexpr int verticalPadding = 8;
+
+/// 当前单元格的左侧标记宽度。画在内边距里，不占文字宽度，因此不影响高度计算。
+constexpr int currentMarkerWidth = 3;
 
 /// 标签的对齐与换行标志。测量与渲染用同一组标志，理由同上。
 constexpr Qt::Alignment labelAlignment = Qt::AlignLeft | Qt::AlignTop;
@@ -70,11 +75,11 @@ bool wrapsContent(CellType type, bool wrapping) {
 
 } // namespace
 
-QString placeholderCellText(CellType type, int index, bool wrapping) {
+QString placeholderCellText(CellType type, int serial, bool wrapping) {
     if (wrapsContent(type, wrapping)) {
-        return sampleParagraph(index);
+        return sampleParagraph(serial);
     }
-    return QStringLiteral("%1  ·  %2").arg(index).arg(typeName(type));
+    return QStringLiteral("%1  ·  %2").arg(serial).arg(typeName(type));
 }
 
 int placeholderCellHeight(const QFontMetrics& metrics, CellType type, const QString& text,
@@ -97,6 +102,13 @@ PlaceholderCellWidget::PlaceholderCellWidget(QWidget* parent)
     : QFrame(parent), m_label(new QLabel(this)) {
     setFrameShape(QFrame::StyledPanel);
 
+    // 占位单元格没有任何自己的交互，鼠标事件一律上传到 viewport，
+    // 由视图根据落点决定当前单元格。widget 被复用，它不知道自己是第几个，
+    // 让视图统一处理比给每个 widget 维护位置更简单。
+    // 阶段 2 的单元格具备编辑能力后，这里需要改为各自处理。
+    setAttribute(Qt::WA_TransparentForMouseEvents);
+    m_label->setAttribute(Qt::WA_TransparentForMouseEvents);
+
     m_label->setAlignment(labelAlignment);
 
     auto* layout = new QHBoxLayout(this);
@@ -109,4 +121,28 @@ void PlaceholderCellWidget::setCell(CellType type, const QString& text, bool wra
     m_type = type;
     m_label->setWordWrap(wrapsContent(type, wrapping));
     m_label->setText(text);
+}
+
+QString PlaceholderCellWidget::text() const {
+    return m_label->text();
+}
+
+void PlaceholderCellWidget::setCurrent(bool current) {
+    if (m_current == current) {
+        return;
+    }
+    m_current = current;
+    update();
+}
+
+void PlaceholderCellWidget::paintEvent(QPaintEvent* event) {
+    QFrame::paintEvent(event);
+    if (!m_current) {
+        return;
+    }
+    // 当前单元格画一条左侧色条。取自调色板而不是写死颜色，
+    // 这样深色与浅色外观下都成立。
+    QPainter painter(this);
+    painter.fillRect(QRect(0, 0, currentMarkerWidth, height()),
+                     palette().color(QPalette::Highlight));
 }
