@@ -5,6 +5,8 @@
 #include <QApplication>
 #include <QCommandLineOption>
 #include <QCommandLineParser>
+#include <QLibraryInfo>
+#include <QTranslator>
 
 #include <cstdio>
 
@@ -14,6 +16,15 @@ int main(int argc, char* argv[]) {
     QApplication::setApplicationName(QStringLiteral("Musebook"));
     QApplication::setApplicationVersion(QStringLiteral(MUSEBOOK_VERSION));
     QApplication::setOrganizationName(QStringLiteral("Musebook"));
+
+    // macOS 的程序菜单里有几项（关于、服务、隐藏、退出）由 Qt 自己生成，文字取自
+    // Qt 的翻译文件而不是本项目的代码。不装载它，那几项就会在一片中文菜单里显示英文。
+    // 界面语言固定为简体中文，因此这里不跟随系统区域设置。必须在建立菜单栏之前装载。
+    auto* qtTranslator = new QTranslator(&app);
+    if (qtTranslator->load(QStringLiteral("qtbase_zh_CN"),
+                           QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+        QApplication::installTranslator(qtTranslator);
+    }
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QStringLiteral("Musebook"));

@@ -81,6 +81,8 @@ Qt Creator 会自动读取 `.clang-format`。
 
   Windows job 已验证通过（Qt 6.10.3 + MSVC 2022 + Ninja）。
 
+- **Qt 的中文翻译文件尚未随应用打包。** macOS 程序菜单里的「关于 / 服务 / 隐藏 / 退出」由 Qt 生成，文字取自 `qtbase_zh_CN.qm`。`main.cpp` 从 `QLibraryInfo::TranslationsPath` 装载它，开发机上指向 Qt 安装目录，因此现在能正常工作。阶段 7 做分发时需要把该文件复制进 bundle，否则那几项会退回英文。
+
 - **CI 不是 macOS 的验收手段。** macOS runner 排队时间过长，macOS 侧以本机构建为准。因此 CI 中只有 Windows job 随 push 自动运行，macOS job 需手动触发：
 
   ```sh
